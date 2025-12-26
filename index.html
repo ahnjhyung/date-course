@@ -66,13 +66,30 @@
             text-align: center; line-height: 24px; font-size: 12px; margin-right: 15px; font-weight: bold;
         }
         
-        /* 이동 정보 (핵심 기능) */
+        /* [수정] 삭제 버튼 스타일 강화 */
+        .btn-delete {
+            margin-left: auto; 
+            background: #fff0f0; 
+            color: #ff6b6b; 
+            border: 1px solid #ff6b6b; 
+            border-radius: 6px;
+            padding: 5px 10px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-delete:hover {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        
+        /* 이동 정보 */
         .transit-info {
             background: #f4f6f8; padding: 8px 15px; font-size: 12px; color: #555;
             display: flex; justify-content: space-between; align-items: center;
             border-left: 3px solid #ccc; margin: 0 20px;
         }
-        /* 경고 스타일 (오래 걸릴 때) */
         .transit-warning {
             background: #FFF0F0; border-left-color: #FF6B6B; color: #D63031; font-weight: bold;
         }
@@ -156,44 +173,38 @@
     }
 
     function addToCourse(place) {
-        // 중복 방지
         if(myCourse.some(p => p.id === place.id)) { alert("이미 추가된 장소입니다."); return; }
         myCourse.push(place);
         renderCourse();
     }
 
-    // --- 3. 핵심 로직: 코스 그리기 및 "보정 거리" 계산 ---
+    // --- 3. 코스 그리기 및 기능 (삭제 버튼 적용) ---
     function renderCourse() {
         var listEl = document.getElementById('myCourseList');
         listEl.innerHTML = '';
-        removeMapElements(); // 기존 마커/선 제거
+        removeMapElements(); 
 
         var linePath = [];
         var bounds = new kakao.maps.LatLngBounds();
-        var totalEstDist = 0; // 총 예상 거리
+        var totalEstDist = 0;
 
         myCourse.forEach(function(place, index) {
             var position = new kakao.maps.LatLng(place.y, place.x);
             
-            // 1) 이동 정보 표시 (첫 장소 제외)
+            // 이동 정보 (거리, 시간, 길찾기)
             if (index > 0) {
                 var prev = myCourse[index-1];
-                
-                // ★ 거리 보정 알고리즘 (직선거리 x 1.4배 = 실제 도로 추정치)
                 var straightDist = getDistance(prev.y, prev.x, place.y, place.x);
                 var estRealDist = Math.round(straightDist * 1.4); 
-                var walkMin = Math.round(estRealDist / 67); // 성인 평균 분속 67m
+                var walkMin = Math.round(estRealDist / 67); 
                 
                 totalEstDist += estRealDist;
 
                 var transitDiv = document.createElement('div');
-                var isLong = walkMin > 20; // 20분 넘으면 경고
+                var isLong = walkMin > 20; 
 
                 transitDiv.className = isLong ? 'transit-info transit-warning' : 'transit-info';
-                
-                var msg = isLong ? `🚶 도보 약 ${walkMin}분 (힘들어요! 택시/버스 추천)` : `🚶 도보 약 ${walkMin}분 (${estRealDist}m)`;
-                
-                // 카카오맵 길찾기 링크 생성
+                var msg = isLong ? `🚶 도보 약 ${walkMin}분 (힘들어요!)` : `🚶 도보 약 ${walkMin}분 (${estRealDist}m)`;
                 var naviLink = `https://map.kakao.com/link/to/${place.place_name},${place.y},${place.x}/from/${prev.place_name},${prev.y},${prev.x}`;
                 
                 transitDiv.innerHTML = `<span>${msg}</span> 
@@ -201,7 +212,7 @@
                 listEl.appendChild(transitDiv);
             }
 
-            // 2) 장소 카드 표시
+            // [수정됨] 장소 카드 + 확실한 삭제 버튼
             var li = document.createElement('div');
             li.className = 'course-item';
             li.innerHTML = `<div class="course-badge">${index+1}</div>
@@ -209,17 +220,15 @@
                                 <div class="place-name" style="font-size:15px;">${place.place_name}</div>
                                 <div class="place-addr" style="font-size:12px;">${place.road_address_name}</div>
                             </div>
-                            <button onclick="deletePlace(${index})" style="margin-left:auto; border:none; background:none; color:#ccc; cursor:pointer;">✖</button>`;
+                            <button class="btn-delete" onclick="deletePlace(${index})">삭제</button>`;
             listEl.appendChild(li);
 
-            // 3) 지도 마커 추가
             var marker = new kakao.maps.Marker({ position: position, map: map, title: place.place_name });
             markers.push(marker);
             linePath.push(position);
             bounds.extend(position);
         });
 
-        // 4) 지도에 선 그리기
         if (linePath.length > 1) {
             polyline = new kakao.maps.Polyline({
                 path: linePath, strokeWeight: 5, strokeColor: '#FF6B6B', strokeOpacity: 0.8, strokeStyle: 'solid'
@@ -233,10 +242,13 @@
         if (myCourse.length > 0) map.setBounds(bounds);
     }
 
-    // 장소 삭제
+    // 장소 삭제 함수
     function deletePlace(index) {
-        myCourse.splice(index, 1); // 배열에서 삭제
-        renderCourse(); // 다시 그리기
+        // 확인 창 띄우기 (실수 방지)
+        if(confirm("이 장소를 코스에서 뺄까?")) {
+            myCourse.splice(index, 1);
+            renderCourse();
+        }
     }
 
     function removeMapElements() {
@@ -245,11 +257,11 @@
         if (polyline) { polyline.setMap(null); polyline = null; }
     }
 
-    // --- 4. 알고리즘: 최단 거리 정렬 (TSP 근사) ---
+    // --- 4. 알고리즘: 최단 거리 정렬 ---
     function optimizeCourse() {
         if(myCourse.length < 3) { alert("최소 3개 장소가 있어야 최적화가 됩니다."); return; }
         
-        var startNode = myCourse[0]; // 첫 장소는 고정
+        var startNode = myCourse[0]; 
         var optimized = [startNode];
         var remaining = myCourse.slice(1);
 
@@ -270,18 +282,15 @@
         alert("거리순으로 동선이 깔끔하게 정리되었습니다! 🚗");
     }
 
-    // Haversine 공식을 이용한 정확한 직선 거리 계산 (단위: m)
     function getDistance(lat1, lon1, lat2, lon2) {
-        var R = 6371; // 지구 반지름 (km)
+        var R = 6371; 
         var dLat = deg2rad(lat2 - lat1); 
         var dLon = deg2rad(lon2 - lon1); 
         var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                 Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c; // km Distance
-        return d * 1000; // m로 변환
+        return R * c * 1000;
     }
-
     function deg2rad(deg) { return deg * (Math.PI/180); }
 </script>
 
