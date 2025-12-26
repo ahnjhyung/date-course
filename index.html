@@ -54,7 +54,7 @@
         }
         .role-btn:hover { opacity: 0.9; }
 
-        /* 버튼 컬러 (이모지 대신 텍스트 색상으로 구분) */
+        /* 버튼 컬러 (순수 텍스트 구분) */
         .btn-start { background: #2ecc71; } /* 초록 */
         .btn-end { background: #e74c3c; }   /* 빨강 */
         .btn-hotel { background: #9b59b6; } /* 보라 */
@@ -73,7 +73,7 @@
             padding: 15px 20px; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center; background: #fff;
         }
         
-        /* 뱃지 스타일 (이모지 제거됨) */
+        /* 뱃지 스타일 (텍스트만 사용) */
         .badge {
             padding: 4px 0; border-radius: 4px; font-size: 11px; font-weight: bold; color: #fff; 
             margin-right: 12px; flex-shrink: 0; width: 45px; text-align: center;
@@ -83,9 +83,9 @@
         .bg-hotel { background: #9b59b6; }
         .bg-spot { background: #3498db; }
 
-        /* 삭제 버튼 */
+        /* 삭제 버튼 (텍스트) */
         .btn-delete {
-            margin-left: auto; background: transparent; color: #ccc; border: 1px solid #eee; 
+            margin-left: auto; background: transparent; color: #999; border: 1px solid #ddd; 
             width: 50px; padding: 4px 0; font-size: 11px; border-radius: 4px; cursor: pointer;
         }
         .btn-delete:hover { background: #fff0f0; color: #e74c3c; border-color: #e74c3c; }
@@ -98,16 +98,16 @@
         }
         .transit-warning { background: #fff5f5; border-left-color: #e74c3c; color: #c0392b; }
         
-        /* [수정] 길찾기 버튼: 테마 컬러에 맞춘 디자인 */
+        /* [수정] 길찾기 버튼: 테마 컬러(보라색 계열) 적용 */
         .btn-navi { 
-            background: #667eea; /* 테마와 동일한 보라색 */
+            background: #667eea; 
             color: #fff; 
             border: none; 
-            padding: 5px 10px; 
+            padding: 6px 12px; 
             border-radius: 4px; 
             font-size: 11px; 
             cursor: pointer; 
-            font-weight: 500;
+            font-weight: bold;
             transition: background 0.2s;
         }
         .btn-navi:hover { background: #5a6fd6; }
@@ -136,7 +136,7 @@
 
     <div id="placesList" class="list-wrap">
         <div style="text-align:center; padding:40px 0; color:#aaa; font-size:13px; line-height: 1.6;">
-            장소를 검색한 후<br>아래 버튼을 눌러 추가하세요.
+            장소를 검색한 후<br>버튼을 눌러 추가하세요.
         </div>
     </div>
 
@@ -146,7 +146,7 @@
             <span id="totalInfo" style="font-size:12px; color:#667eea;"></span>
         </div>
         <div id="myCourseList" class="list-wrap" style="background:#fff;"></div>
-        <button class="btn-optimize" onclick="optimizeCourse()">경로 최적화 (출발/도착 고정)</button>
+        <button class="btn-optimize" onclick="optimizeCourse()">경로 최적화 실행</button>
     </div>
 </div>
 
@@ -180,7 +180,7 @@
         places.forEach(function(place) {
             var el = document.createElement('div');
             el.className = 'place-item';
-            // 이모지 제거된 텍스트 버튼
+            // 버튼 텍스트만 사용
             el.innerHTML = `
                 <div class="place-name">${place.place_name}</div>
                 <div class="place-addr">${place.road_address_name}</div>
@@ -229,7 +229,7 @@
         myCourse.forEach(function(place, index) {
             var position = new kakao.maps.LatLng(place.y, place.x);
             
-            // 이동 정보 (거리/시간/길찾기)
+            // 이동 정보: 화살표나 기호 없이 텍스트로만 표시
             if (index > 0) {
                 var prev = myCourse[index-1];
                 var dist = getDistance(prev.y, prev.x, place.y, place.x) * 1.3; 
@@ -240,8 +240,7 @@
                 var isWarn = min > 20;
                 div.className = isWarn ? 'transit-info transit-warning' : 'transit-info';
                 
-                // 이모지 제거: [이동], [주의] 등 텍스트 사용
-                var infoText = isWarn ? `[주의] 도보 약 ${min}분 (너무 멀어요)` : `[이동] 도보 약 ${min}분 (${Math.round(dist)}m)`;
+                var infoText = isWarn ? `[주의] 도보 약 ${min}분 (멈)` : `[이동] 도보 약 ${min}분 (${Math.round(dist)}m)`;
                 var navilink = `https://map.kakao.com/link/to/${place.place_name},${place.y},${place.x}/from/${prev.place_name},${prev.y},${prev.x}`;
                 
                 div.innerHTML = `<span>${infoText}</span>
