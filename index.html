@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>낭만의 밤: 마스터 플랜</title>
+    <title>낭만의 밤: 알고리즘 플래너</title>
     <style>
-        /* --- [기본 스타일] --- */
+        /* --- 기본 스타일 (이모지 X, 깔끔한 디자인) --- */
         * { box-sizing: border-box; }
         body { 
             font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; 
@@ -16,14 +16,12 @@
             box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 20; 
         }
         
-        /* 헤더 디자인 */
         .header {
             padding: 25px 20px 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* 보라빛 테마 */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
         }
         .header h1 { margin: 0 0 15px 0; font-size: 20px; color: #fff; font-weight: 700; letter-spacing: -0.5px; }
         
-        /* 검색창 */
         .search-box {
             display: flex; background: #fff; border-radius: 6px; overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -35,90 +33,92 @@
             background: #333; color: #fff; border: none; padding: 0 20px; font-size: 14px; font-weight: bold; cursor: pointer;
         }
 
-        /* 리스트 영역 */
-        .list-wrap { flex: 1; overflow-y: auto; background: #f5f5f5; padding: 10px; }
-        
-        /* 검색 결과 카드 */
-        .place-item {
-            background: #fff; margin-bottom: 10px; padding: 15px; border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #eee;
+        .day-tabs-container {
+            background: #f0f2f5; padding: 10px 10px 0; border-bottom: 1px solid #ddd; display: flex; align-items: flex-end; gap: 5px; overflow-x: auto;
         }
-        .place-name { font-weight: bold; font-size: 15px; margin-bottom: 5px; color: #333; }
-        .place-addr { font-size: 12px; color: #888; margin-bottom: 12px; }
+        .day-tab {
+            padding: 10px 20px; background: #e0e0e0; color: #666; border-radius: 8px 8px 0 0; 
+            font-size: 13px; font-weight: bold; cursor: pointer; border: 1px solid #ccc; border-bottom: none;
+            min-width: 70px; text-align: center;
+        }
+        .day-tab.active {
+            background: #fff; color: #667eea; padding-bottom: 12px; margin-bottom: -1px; 
+            border-top: 3px solid #667eea; z-index: 10;
+        }
+        .btn-add-day {
+            padding: 8px 12px; background: #333; color: #fff; border-radius: 6px; border: none; 
+            font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 5px; margin-left: 5px;
+        }
+
+        .scroll-area { flex: 1; overflow-y: auto; background: #f8f9fa; }
+
+        .section-box {
+            background: #fff; margin: 10px; padding: 15px; border-radius: 8px; border: 1px solid #eee;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            font-size: 14px; font-weight: bold; color: #667eea; margin-bottom: 10px; display: block;
+        }
+
+        .place-item { border-bottom: 1px solid #f0f0f0; padding: 10px 0; }
+        .place-item:last-child { border-bottom: none; }
+        .place-name { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+        .place-addr { font-size: 12px; color: #888; margin-bottom: 8px; }
         
-        /* 역할 선택 버튼 그룹 */
         .role-btn-group { display: flex; gap: 5px; }
         .role-btn {
-            flex: 1; border: none; padding: 8px 0; border-radius: 4px; font-size: 12px; font-weight: bold; 
-            cursor: pointer; transition: 0.2s; color: #fff;
+            flex: 1; border: none; padding: 6px 0; border-radius: 4px; font-size: 11px; font-weight: bold; 
+            cursor: pointer; color: #fff;
         }
-        .role-btn:hover { opacity: 0.9; }
+        .btn-start { background: #2ecc71; } 
+        .btn-end { background: #e74c3c; }   
+        .btn-hotel { background: #9b59b6; } 
+        .btn-spot { background: #3498db; }  
 
-        /* 버튼 컬러 (순수 텍스트 구분) */
-        .btn-start { background: #2ecc71; } /* 초록 */
-        .btn-end { background: #e74c3c; }   /* 빨강 */
-        .btn-hotel { background: #9b59b6; } /* 보라 */
-        .btn-spot { background: #3498db; }  /* 파랑 */
-
-        /* 내 코스 영역 */
-        .course-section {
-            height: 55%; background: #fff; display: flex; flex-direction: column; border-top: 1px solid #ddd;
-        }
-        .course-header {
-            padding: 15px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;
-        }
-        .course-header span { font-size: 14px; font-weight: bold; color: #333; }
-        
         .course-item {
-            padding: 15px 20px; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center; background: #fff;
+            display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f5;
         }
-        
-        /* 뱃지 스타일 (텍스트만 사용) */
         .badge {
             padding: 4px 0; border-radius: 4px; font-size: 11px; font-weight: bold; color: #fff; 
-            margin-right: 12px; flex-shrink: 0; width: 45px; text-align: center;
+            margin-right: 10px; width: 40px; text-align: center; flex-shrink: 0;
         }
         .bg-start { background: #2ecc71; }
         .bg-end { background: #e74c3c; }
         .bg-hotel { background: #9b59b6; }
         .bg-spot { background: #3498db; }
 
-        /* 삭제 버튼 (텍스트) */
         .btn-delete {
-            margin-left: auto; background: transparent; color: #999; border: 1px solid #ddd; 
-            width: 50px; padding: 4px 0; font-size: 11px; border-radius: 4px; cursor: pointer;
+            margin-left: auto; background: none; border: 1px solid #ddd; color: #999;
+            width: 40px; font-size: 11px; border-radius: 4px; cursor: pointer;
         }
-        .btn-delete:hover { background: #fff0f0; color: #e74c3c; border-color: #e74c3c; }
 
-        /* 이동 정보 및 길찾기 버튼 */
-        .transit-info {
-            background: #f8f9fa; padding: 10px 20px; font-size: 12px; color: #666;
-            display: flex; justify-content: space-between; align-items: center; 
-            border-left: 3px solid #ddd; margin: 0 20px;
+        .scenario-card {
+            background: #f4f6f8; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px;
+            cursor: pointer; transition: 0.2s; position: relative;
         }
-        .transit-warning { background: #fff5f5; border-left-color: #e74c3c; color: #c0392b; }
-        
-        /* [수정] 길찾기 버튼: 테마 컬러(보라색 계열) 적용 */
-        .btn-navi { 
-            background: #667eea; 
-            color: #fff; 
-            border: none; 
-            padding: 6px 12px; 
-            border-radius: 4px; 
-            font-size: 11px; 
-            cursor: pointer; 
-            font-weight: bold;
-            transition: background 0.2s;
+        .scenario-card:hover { border-color: #667eea; background: #fff; }
+        .scenario-card.active {
+            border: 2px solid #667eea; background: #fff; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
         }
-        .btn-navi:hover { background: #5a6fd6; }
+        .scenario-tag {
+            font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 20px; 
+            background: #999; color: #fff; display: inline-block; margin-bottom: 5px;
+        }
+        .tag-best { background: #e74c3c; } 
+        .tag-alt { background: #3498db; }  
+        .scenario-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .scenario-desc { font-size: 12px; color: #666; }
 
-        /* 최적화 버튼 */
-        .btn-optimize {
-            width: 90%; margin: 15px auto; padding: 14px; border-radius: 6px; border: none;
-            background: #333; color: #fff; font-size: 14px; font-weight: bold; cursor: pointer;
-            transition: background 0.2s;
+        .bottom-area {
+            padding: 15px; background: #fff; border-top: 1px solid #ddd;
         }
-        .btn-optimize:hover { background: #111; }
+        .btn-analyze {
+            width: 100%; padding: 14px; border-radius: 6px; border: none;
+            background: #333; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer;
+        }
+        .btn-analyze:hover { background: #111; }
+
+        .status-msg { text-align: center; padding: 20px; color: #999; font-size: 13px; }
 
         #map { flex-grow: 1; }
     </style>
@@ -129,24 +129,38 @@
     <div class="header">
         <h1>Date Course Master</h1>
         <form onsubmit="searchPlaces(); return false;" class="search-box">
-            <input type="text" id="keyword" placeholder="장소 검색 (예: 강남역, 에버랜드)">
+            <input type="text" id="keyword" placeholder="장소 검색 (예: 수원역, 에버랜드)">
             <button type="submit">검색</button>
         </form>
     </div>
 
-    <div id="placesList" class="list-wrap">
-        <div style="text-align:center; padding:40px 0; color:#aaa; font-size:13px; line-height: 1.6;">
-            장소를 검색한 후<br>버튼을 눌러 추가하세요.
+    <div class="day-tabs-container">
+        <div id="dayTabsWrapper" style="display:flex; gap:5px;"></div>
+        <button class="btn-add-day" onclick="addNewDay()">+</button>
+    </div>
+
+    <div class="scroll-area">
+        <div id="searchSection" class="section-box" style="display:none;">
+            <span class="section-title">검색 결과</span>
+            <div id="placesList"></div>
+        </div>
+
+        <div id="scenarioSection" class="section-box" style="display:none;">
+            <span class="section-title">AI 경로 분석 결과</span>
+            <div id="scenarioList"></div>
+        </div>
+
+        <div class="section-box">
+            <span class="section-title" id="courseTitle">1일차 상세 일정</span>
+            <div id="myCourseList">
+                <div class="status-msg">가고 싶은 장소를 검색해서 추가해주세요.</div>
+            </div>
+            <div id="totalInfo" style="margin-top:10px; font-size:13px; font-weight:bold; color:#667eea; text-align:right;"></div>
         </div>
     </div>
 
-    <div class="course-section">
-        <div class="course-header">
-            <span>내 여행 플랜</span>
-            <span id="totalInfo" style="font-size:12px; color:#667eea;"></span>
-        </div>
-        <div id="myCourseList" class="list-wrap" style="background:#fff;"></div>
-        <button class="btn-optimize" onclick="optimizeCourse()">경로 최적화 실행</button>
+    <div class="bottom-area">
+        <button class="btn-analyze" onclick="analyzeScenarios()">최적 경로 시나리오 분석</button>
     </div>
 </div>
 
@@ -160,17 +174,49 @@
     var map = new kakao.maps.Map(mapContainer, mapOption); 
     var ps = new kakao.maps.services.Places(); 
     
-    var myCourse = []; 
+    var allCourses = { 1: [] }; 
+    var currentDay = 1; 
     var markers = []; 
     var polyline = null; 
 
+    renderDayTabs();
+
+    function renderDayTabs() {
+        var wrapper = document.getElementById('dayTabsWrapper');
+        wrapper.innerHTML = '';
+        Object.keys(allCourses).forEach(function(day) {
+            var tab = document.createElement('div');
+            tab.className = 'day-tab' + (parseInt(day) === currentDay ? ' active' : '');
+            tab.innerText = day + '일차';
+            tab.onclick = function() { switchDay(parseInt(day)); };
+            wrapper.appendChild(tab);
+        });
+    }
+
+    function addNewDay() {
+        var newDay = Object.keys(allCourses).length + 1;
+        allCourses[newDay] = []; 
+        switchDay(newDay); 
+    }
+
+    function switchDay(day) {
+        currentDay = day;
+        document.getElementById('courseTitle').innerText = day + '일차 상세 일정';
+        document.getElementById('scenarioSection').style.display = 'none'; 
+        renderDayTabs(); 
+        renderCourse();  
+    }
+
     function searchPlaces() {
         var keyword = document.getElementById('keyword').value;
-        if (!keyword.trim()) { alert('키워드를 입력해주세요.'); return; }
+        if (!keyword.trim()) { alert('검색어를 입력하세요.'); return; }
         ps.keywordSearch(keyword, function(data, status) {
-            if (status === kakao.maps.services.Status.OK) displayPlaces(data);
-            else if (status === kakao.maps.services.Status.ZERO_RESULT) alert('검색 결과가 없습니다.');
-            else alert('오류가 발생했습니다.');
+            if (status === kakao.maps.services.Status.OK) {
+                document.getElementById('searchSection').style.display = 'block';
+                displayPlaces(data);
+            } else {
+                alert('검색 결과가 없습니다.');
+            }
         }); 
     }
 
@@ -180,7 +226,6 @@
         places.forEach(function(place) {
             var el = document.createElement('div');
             el.className = 'place-item';
-            // 버튼 텍스트만 사용
             el.innerHTML = `
                 <div class="place-name">${place.place_name}</div>
                 <div class="place-addr">${place.road_address_name}</div>
@@ -196,13 +241,11 @@
     }
 
     function addToCourse(place, type) {
-        if(myCourse.some(p => p.id === place.id)) { alert("이미 리스트에 있습니다."); return; }
+        var myCourse = allCourses[currentDay];
+        if(myCourse.some(p => p.id === place.id)) { alert("이미 추가된 장소입니다."); return; }
         
-        if(type === 'start') {
-            myCourse = myCourse.filter(p => p.type !== 'start');
-        } else if(type === 'end') {
-            myCourse = myCourse.filter(p => p.type !== 'end');
-        }
+        if(type === 'start') myCourse = myCourse.filter(p => p.type !== 'start');
+        if(type === 'end') myCourse = myCourse.filter(p => p.type !== 'end');
 
         place.type = type;
         
@@ -213,39 +256,33 @@
             if(endIdx !== -1) myCourse.splice(endIdx, 0, place);
             else myCourse.push(place);
         }
-
+        allCourses[currentDay] = myCourse;
         renderCourse();
     }
 
-    function renderCourse() {
+    function renderCourse(tempCourse) {
+        var courseToRender = tempCourse || allCourses[currentDay];
         var listEl = document.getElementById('myCourseList');
         listEl.innerHTML = '';
         removeMapElements(); 
+
+        if (courseToRender.length === 0) {
+            listEl.innerHTML = '<div class="status-msg">가고 싶은 장소를 검색해서 추가해주세요.</div>';
+            document.getElementById('totalInfo').innerText = '';
+            return;
+        }
 
         var linePath = [];
         var bounds = new kakao.maps.LatLngBounds();
         var totalDist = 0;
 
-        myCourse.forEach(function(place, index) {
+        courseToRender.forEach(function(place, index) {
             var position = new kakao.maps.LatLng(place.y, place.x);
             
-            // 이동 정보: 화살표나 기호 없이 텍스트로만 표시
             if (index > 0) {
-                var prev = myCourse[index-1];
+                var prev = courseToRender[index-1];
                 var dist = getDistance(prev.y, prev.x, place.y, place.x) * 1.3; 
-                var min = Math.round(dist / 67);
                 totalDist += dist;
-
-                var div = document.createElement('div');
-                var isWarn = min > 20;
-                div.className = isWarn ? 'transit-info transit-warning' : 'transit-info';
-                
-                var infoText = isWarn ? `[주의] 도보 약 ${min}분 (멈)` : `[이동] 도보 약 ${min}분 (${Math.round(dist)}m)`;
-                var navilink = `https://map.kakao.com/link/to/${place.place_name},${place.y},${place.x}/from/${prev.place_name},${prev.y},${prev.x}`;
-                
-                div.innerHTML = `<span>${infoText}</span>
-                                 <button class="btn-navi" onclick="window.open('${navilink}')">길찾기</button>`;
-                listEl.appendChild(div);
             }
 
             var li = document.createElement('div');
@@ -259,10 +296,10 @@
 
             li.innerHTML = `<span class="badge ${badgeClass}">${badgeText}</span>
                             <div style="flex:1;">
-                                <div style="font-weight:bold; font-size:14px; color:#333;">${place.place_name}</div>
-                                <div style="font-size:11px; color:#999;">${place.category_group_name || '장소'}</div>
+                                <div style="font-weight:bold; font-size:14px;">${place.place_name}</div>
+                                <div style="font-size:11px; color:#999;">${place.category_group_name || ''}</div>
                             </div>
-                            <button class="btn-delete" onclick="deletePlace(${index})">삭제</button>`;
+                            ${!tempCourse ? `<button class="btn-delete" onclick="deletePlace(${index})">삭제</button>` : ''}`;
             listEl.appendChild(li);
 
             var marker = new kakao.maps.Marker({ position: position, map: map, title: place.place_name });
@@ -273,20 +310,20 @@
 
         if (linePath.length > 1) {
             polyline = new kakao.maps.Polyline({
-                path: linePath, strokeWeight: 6, strokeColor: '#667eea', strokeOpacity: 0.8, strokeStyle: 'solid'
+                path: linePath, strokeWeight: 5, strokeColor: '#667eea', strokeOpacity: 0.8, strokeStyle: 'solid'
             });
             polyline.setMap(map);
-            document.getElementById('totalInfo').innerText = `총 거리 ${ (totalDist/1000).toFixed(1) }km`;
+            document.getElementById('totalInfo').innerText = `총 예상 거리 ${ (totalDist/1000).toFixed(1) }km`;
         } else {
             document.getElementById('totalInfo').innerText = '';
         }
 
-        if (myCourse.length > 0) map.setBounds(bounds);
+        if (courseToRender.length > 0) map.setBounds(bounds);
     }
 
     function deletePlace(index) {
-        if(confirm("이 장소를 목록에서 삭제하시겠습니까?")) {
-            myCourse.splice(index, 1);
+        if(confirm("삭제하시겠습니까?")) {
+            allCourses[currentDay].splice(index, 1);
             renderCourse();
         }
     }
@@ -297,36 +334,101 @@
         if (polyline) { polyline.setMap(null); polyline = null; }
     }
 
-    function optimizeCourse() {
-        if(myCourse.length < 3) { alert("최적화하려면 3개 이상의 장소가 필요합니다."); return; }
+    // --- [알고리즘 업그레이드] 완전 탐색(Brute Force) 시나리오 분석 ---
+    function analyzeScenarios() {
+        var myCourse = allCourses[currentDay];
+        if(myCourse.length < 3) { alert("시나리오 분석을 위해 최소 3개 이상의 장소가 필요합니다."); return; }
 
         var startNode = myCourse.find(p => p.type === 'start');
         var endNode = myCourse.find(p => p.type === 'end');
         var middleNodes = myCourse.filter(p => p.type !== 'start' && p.type !== 'end');
 
+        // 출발지가 없으면 첫번째를 출발지로
         if(!startNode) { startNode = myCourse[0]; middleNodes = middleNodes.filter(p => p !== startNode); }
-        
-        var sorted = [startNode];
-        var remaining = middleNodes;
 
-        while(remaining.length > 0) {
-            var current = sorted[sorted.length-1];
-            var nearestIdx = -1;
-            var minDist = Infinity;
+        // 순열 생성 (모든 경우의 수)
+        var perms = getPermutations(middleNodes);
+        var scenarios = [];
 
-            for(var i=0; i<remaining.length; i++) {
-                var d = getDistance(current.y, current.x, remaining[i].y, remaining[i].x);
-                if(d < minDist) { minDist = d; nearestIdx = i; }
+        // 각 순열에 대해 거리 계산
+        perms.forEach(function(perm) {
+            var tempPath = [startNode].concat(perm);
+            if(endNode) tempPath.push(endNode);
+
+            var dist = calculateTotalDist(tempPath);
+            scenarios.push({ path: tempPath, dist: dist });
+        });
+
+        // 거리순 정렬
+        scenarios.sort(function(a, b) { return a.dist - b.dist; });
+
+        // 상위 3개 추출 (중복 제거 로직은 생략, 단순 상위 3개)
+        var topScenarios = scenarios.slice(0, 3);
+
+        displayScenarios(topScenarios);
+    }
+
+    function displayScenarios(scenarios) {
+        var container = document.getElementById('scenarioList');
+        container.innerHTML = '';
+        document.getElementById('scenarioSection').style.display = 'block';
+
+        scenarios.forEach(function(scen, idx) {
+            var card = document.createElement('div');
+            card.className = 'scenario-card';
+            
+            var tagName = idx === 0 ? '최적 추천 (Best)' : '대안 경로 ' + (idx + 1);
+            var tagClass = idx === 0 ? 'tag-best' : 'tag-alt';
+            
+            // 경로 텍스트 요약
+            var pathSummary = scen.path.map(p => p.place_name).join(' → ');
+
+            card.innerHTML = `
+                <span class="scenario-tag ${tagClass}">${tagName}</span>
+                <div class="scenario-title">${(scen.dist/1000).toFixed(1)}km 코스</div>
+                <div class="scenario-desc">${pathSummary}</div>
+            `;
+            
+            card.onclick = function() {
+                // 선택 시 시각적 효과 및 지도 반영
+                document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                
+                // 실제 데이터 업데이트 X, 미리보기만 제공
+                // 만약 확정하려면 별도 버튼 필요하지만, 여기선 클릭 시 바로 반영하는 UX 채택
+                allCourses[currentDay] = scen.path; 
+                renderCourse(); 
+            };
+            
+            container.appendChild(card);
+        });
+
+        alert("AI 분석 완료! 3가지 추천 시나리오가 생성되었습니다.");
+    }
+
+    // 순열 생성 함수 (재귀)
+    function getPermutations(arr) {
+        if (arr.length === 0) return [[]];
+        var first = arr[0];
+        var rest = arr.slice(1);
+        var permsWithoutFirst = getPermutations(rest);
+        var allPermutations = [];
+
+        permsWithoutFirst.forEach(function(perm) {
+            for (var i = 0; i <= perm.length; i++) {
+                var permWithFirst = perm.slice(0, i).concat([first]).concat(perm.slice(i));
+                allPermutations.push(permWithFirst);
             }
-            sorted.push(remaining[nearestIdx]);
-            remaining.splice(nearestIdx, 1);
+        });
+        return allPermutations;
+    }
+
+    function calculateTotalDist(path) {
+        var total = 0;
+        for(var i=0; i<path.length-1; i++) {
+            total += getDistance(path[i].y, path[i].x, path[i+1].y, path[i+1].x);
         }
-
-        if(endNode) sorted.push(endNode);
-
-        myCourse = sorted;
-        renderCourse();
-        alert("동선 최적화가 완료되었습니다.");
+        return total;
     }
 
     function getDistance(lat1, lon1, lat2, lon2) {
