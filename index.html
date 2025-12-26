@@ -3,133 +3,120 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>낭만의 밤: 리얼 데이트 코스</title>
+    <title>낭만의 밤: 마스터 플랜</title>
     <style>
-        /* --- [스타일] 로맨틱하고 깔끔한 UI --- */
+        /* --- [스타일] --- */
         * { box-sizing: border-box; }
         body { 
             font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; 
             margin: 0; padding: 0; display: flex; height: 100vh; color: #333; overflow: hidden;
         }
         #menu_wrap { 
-            width: 400px; display: flex; flex-direction: column; background: #fff; 
+            width: 420px; display: flex; flex-direction: column; background: #fff; 
             box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 20; 
         }
         
-        /* 헤더 & 검색 */
         .header {
-            padding: 20px;
-            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+            padding: 20px 20px 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* 보라빛 테마로 변경 */
         }
         .header h1 { margin: 0 0 10px 0; font-size: 20px; color: #fff; font-weight: 800; }
         .search-box {
             display: flex; background: #fff; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .search-box input {
-            flex: 1; border: none; padding: 12px; font-size: 15px; outline: none;
-        }
+        .search-box input { flex: 1; border: none; padding: 12px; font-size: 15px; outline: none; }
         .search-box button {
-            background: #FF6B6B; color: #fff; border: none; padding: 0 20px; 
-            font-weight: bold; cursor: pointer;
+            background: #333; color: #fff; border: none; padding: 0 20px; font-weight: bold; cursor: pointer;
         }
 
-        /* 리스트 공통 */
-        .list-wrap { flex: 1; overflow-y: auto; background: #f9f9f9; padding: 10px; }
-        .list-wrap::-webkit-scrollbar { width: 6px; }
-        .list-wrap::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
-
-        /* 장소 카드 */
+        .list-wrap { flex: 1; overflow-y: auto; background: #f5f5f5; padding: 10px; }
+        
+        /* 검색 결과 카드 */
         .place-item {
             background: #fff; margin-bottom: 10px; padding: 15px; border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .place-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .place-name { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
-        .place-addr { font-size: 13px; color: #888; }
+        .place-name { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .place-addr { font-size: 13px; color: #888; margin-bottom: 10px; }
+        
+        /* 역할 선택 버튼들 */
+        .role-btn-group { display: flex; gap: 5px; }
+        .role-btn {
+            flex: 1; border: none; padding: 8px 0; border-radius: 6px; font-size: 12px; font-weight: bold; 
+            cursor: pointer; transition: 0.2s; color: #fff;
+        }
+        .btn-start { background: #2ecc71; } /* 출발: 초록 */
+        .btn-end { background: #e74c3c; }   /* 도착: 빨강 */
+        .btn-hotel { background: #9b59b6; } /* 숙소: 보라 */
+        .btn-spot { background: #3498db; }  /* 경유: 파랑 */
+        .role-btn:hover { opacity: 0.8; transform: scale(1.02); }
 
-        /* 코스 영역 */
+        /* 내 코스 영역 */
         .course-section {
-            height: 50%; background: #fff; display: flex; flex-direction: column; 
-            border-top: 2px solid #eee;
+            height: 55%; background: #fff; display: flex; flex-direction: column; border-top: 2px solid #ddd;
         }
         .course-header {
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #f0f0f0; background: #fff;
+            padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
         }
         .course-item {
-            position: relative; margin-bottom: 0; border-radius: 0; border-bottom: 1px solid #f5f5f5;
-            padding: 15px 20px; display: flex; align-items: center;
-        }
-        .course-badge {
-            width: 24px; height: 24px; background: #333; color: #fff; border-radius: 50%;
-            text-align: center; line-height: 24px; font-size: 12px; margin-right: 15px; font-weight: bold;
+            padding: 12px 15px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; background: #fff;
         }
         
-        /* [수정] 삭제 버튼 스타일 강화 */
+        /* 코스 뱃지 디자인 */
+        .badge {
+            padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #fff; margin-right: 10px; flex-shrink: 0; width: 50px; text-align: center;
+        }
+        .bg-start { background: #2ecc71; }
+        .bg-end { background: #e74c3c; }
+        .bg-hotel { background: #9b59b6; }
+        .bg-spot { background: #3498db; }
+
         .btn-delete {
-            margin-left: auto; 
-            background: #fff0f0; 
-            color: #ff6b6b; 
-            border: 1px solid #ff6b6b; 
-            border-radius: 6px;
-            padding: 5px 10px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            cursor: pointer;
-            transition: 0.2s;
+            margin-left: auto; background: #eee; color: #888; border: none; width: 24px; height: 24px;
+            border-radius: 50%; cursor: pointer; font-weight: bold;
         }
-        .btn-delete:hover {
-            background: #ff6b6b;
-            color: #fff;
-        }
-        
-        /* 이동 정보 */
+        .btn-delete:hover { background: #e74c3c; color: #fff; }
+
         .transit-info {
-            background: #f4f6f8; padding: 8px 15px; font-size: 12px; color: #555;
-            display: flex; justify-content: space-between; align-items: center;
-            border-left: 3px solid #ccc; margin: 0 20px;
+            background: #f8f9fa; padding: 8px 15px; font-size: 12px; color: #555;
+            display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #ccc; margin: 0 15px;
         }
-        .transit-warning {
-            background: #FFF0F0; border-left-color: #FF6B6B; color: #D63031; font-weight: bold;
-        }
-        .btn-kakao-nav {
-            background: #FEE500; color: #333; border: none; border-radius: 4px; 
-            padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer; margin-left: 8px;
-        }
+        .transit-warning { background: #fff0f0; border-left-color: #e74c3c; color: #c0392b; font-weight: bold; }
+        .btn-navi { background: #FEE500; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
 
         .btn-optimize {
-            width: 90%; margin: 10px auto; padding: 15px; border-radius: 12px; border: none;
-            background: #333; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer;
+            width: 90%; margin: 10px auto; padding: 14px; border-radius: 8px; border: none;
+            background: #333; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer;
         }
 
-        #map { flex-grow: 1; height: 100%; }
+        #map { flex-grow: 1; }
     </style>
 </head>
 <body>
 
 <div id="menu_wrap">
     <div class="header">
-        <h1>💕 Date Course Maker</h1>
+        <h1>🗺️ Date Course Master</h1>
         <form onsubmit="searchPlaces(); return false;" class="search-box">
-            <input type="text" id="keyword" placeholder="장소 검색 (예: 에버랜드, 강남역)">
+            <input type="text" id="keyword" placeholder="장소 검색 (예: 수원역, 에버랜드)">
             <button type="submit">검색</button>
         </form>
     </div>
 
     <div id="placesList" class="list-wrap">
-        <div style="text-align:center; padding:50px 0; color:#aaa;">
-            장소를 검색하고 클릭해서<br>코스에 추가하세요.
+        <div style="text-align:center; padding:40px 0; color:#aaa; font-size:14px;">
+            장소를 검색하고<br>역할(출발/도착/숙소)을 지정하세요.
         </div>
     </div>
 
     <div class="course-section">
         <div class="course-header">
-            <span style="font-weight:bold; font-size:16px;">내 여행 코스</span>
-            <span id="totalInfo" style="font-size:13px; color:#FF6B6B; font-weight:bold;"></span>
+            <span style="font-weight:bold;">내 여행 플랜</span>
+            <span id="totalInfo" style="font-size:12px; color:#e74c3c; font-weight:bold;"></span>
         </div>
         <div id="myCourseList" class="list-wrap" style="background:#fff;"></div>
-        <button class="btn-optimize" onclick="optimizeCourse()">✨ 동선 최적화 (거리순 정렬)</button>
+        <button class="btn-optimize" onclick="optimizeCourse()">✨ 경로 최적화 (출발/도착 고정)</button>
     </div>
 </div>
 
@@ -138,7 +125,6 @@
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4008a66a7ff5dc511df12d63cfeac1f6&libraries=services"></script>
 
 <script>
-    // --- 1. 지도 초기화 ---
     var mapContainer = document.getElementById('map'), 
         mapOption = { center: new kakao.maps.LatLng(37.322157, 127.097858), level: 7 }; 
     var map = new kakao.maps.Map(mapContainer, mapOption); 
@@ -148,10 +134,9 @@
     var markers = []; 
     var polyline = null; 
 
-    // --- 2. 검색 관련 함수 ---
     function searchPlaces() {
         var keyword = document.getElementById('keyword').value;
-        if (!keyword.trim()) { alert('장소를 입력해주세요!'); return; }
+        if (!keyword.trim()) { alert('키워드를 입력해주세요!'); return; }
         ps.keywordSearch(keyword, function(data, status) {
             if (status === kakao.maps.services.Status.OK) displayPlaces(data);
             else if (status === kakao.maps.services.Status.ZERO_RESULT) alert('검색 결과가 없습니다.');
@@ -165,20 +150,49 @@
         places.forEach(function(place) {
             var el = document.createElement('div');
             el.className = 'place-item';
-            el.innerHTML = '<div class="place-name">' + place.place_name + '</div>' +
-                           '<div class="place-addr">' + place.road_address_name + '</div>';
-            el.onclick = function() { addToCourse(place); };
+            // 역할 선택 버튼 4개 생성
+            el.innerHTML = `
+                <div class="place-name">${place.place_name}</div>
+                <div class="place-addr">${place.road_address_name}</div>
+                <div class="role-btn-group">
+                    <button class="role-btn btn-start" onclick='addToCourse(${JSON.stringify(place)}, "start")'>🚩출발</button>
+                    <button class="role-btn btn-spot" onclick='addToCourse(${JSON.stringify(place)}, "spot")'>📍경유</button>
+                    <button class="role-btn btn-hotel" onclick='addToCourse(${JSON.stringify(place)}, "hotel")'>🏨숙소</button>
+                    <button class="role-btn btn-end" onclick='addToCourse(${JSON.stringify(place)}, "end")'>🏁도착</button>
+                </div>
+            `;
             listEl.appendChild(el);
         });
     }
 
-    function addToCourse(place) {
-        if(myCourse.some(p => p.id === place.id)) { alert("이미 추가된 장소입니다."); return; }
-        myCourse.push(place);
+    // 장소 추가 (역할 포함)
+    function addToCourse(place, type) {
+        // 중복 체크
+        if(myCourse.some(p => p.id === place.id)) { alert("이미 리스트에 있습니다."); return; }
+        
+        // 출발/도착지는 하나만 존재해야 함 (기존 것 대체)
+        if(type === 'start') {
+            myCourse = myCourse.filter(p => p.type !== 'start');
+        } else if(type === 'end') {
+            myCourse = myCourse.filter(p => p.type !== 'end');
+        }
+
+        // 객체에 type 속성 추가해서 저장
+        place.type = type;
+        
+        // 순서 로직: 출발은 맨 앞, 도착은 맨 뒤로 보내기
+        if(type === 'start') myCourse.unshift(place);
+        else if(type === 'end') myCourse.push(place);
+        else {
+            // 도착지가 있다면 그 바로 앞에, 없다면 맨 뒤에 추가
+            var endIdx = myCourse.findIndex(p => p.type === 'end');
+            if(endIdx !== -1) myCourse.splice(endIdx, 0, place);
+            else myCourse.push(place);
+        }
+
         renderCourse();
     }
 
-    // --- 3. 코스 그리기 및 기능 (삭제 버튼 적용) ---
     function renderCourse() {
         var listEl = document.getElementById('myCourseList');
         listEl.innerHTML = '';
@@ -186,43 +200,48 @@
 
         var linePath = [];
         var bounds = new kakao.maps.LatLngBounds();
-        var totalEstDist = 0;
+        var totalDist = 0;
 
         myCourse.forEach(function(place, index) {
             var position = new kakao.maps.LatLng(place.y, place.x);
             
-            // 이동 정보 (거리, 시간, 길찾기)
+            // 이동 정보 (거리/시간/길찾기)
             if (index > 0) {
                 var prev = myCourse[index-1];
-                var straightDist = getDistance(prev.y, prev.x, place.y, place.x);
-                var estRealDist = Math.round(straightDist * 1.4); 
-                var walkMin = Math.round(estRealDist / 67); 
-                
-                totalEstDist += estRealDist;
+                var dist = getDistance(prev.y, prev.x, place.y, place.x) * 1.3; // 보정계수
+                var min = Math.round(dist / 67);
+                totalDist += dist;
 
-                var transitDiv = document.createElement('div');
-                var isLong = walkMin > 20; 
-
-                transitDiv.className = isLong ? 'transit-info transit-warning' : 'transit-info';
-                var msg = isLong ? `🚶 도보 약 ${walkMin}분 (힘들어요!)` : `🚶 도보 약 ${walkMin}분 (${estRealDist}m)`;
-                var naviLink = `https://map.kakao.com/link/to/${place.place_name},${place.y},${place.x}/from/${prev.place_name},${prev.y},${prev.x}`;
+                var div = document.createElement('div');
+                var isWarn = min > 20;
+                div.className = isWarn ? 'transit-info transit-warning' : 'transit-info';
+                var navilink = `https://map.kakao.com/link/to/${place.place_name},${place.y},${place.x}/from/${prev.place_name},${prev.y},${prev.x}`;
                 
-                transitDiv.innerHTML = `<span>${msg}</span> 
-                                        <button class="btn-kakao-nav" onclick="window.open('${naviLink}')">길찾기 ▶</button>`;
-                listEl.appendChild(transitDiv);
+                div.innerHTML = `<span>${isWarn ? '⚠️' : '🚶'} 약 ${min}분 (${Math.round(dist)}m)</span>
+                                 <button class="btn-navi" onclick="window.open('${navilink}')">길찾기</button>`;
+                listEl.appendChild(div);
             }
 
-            // [수정됨] 장소 카드 + 확실한 삭제 버튼
+            // UI 렌더링
             var li = document.createElement('div');
             li.className = 'course-item';
-            li.innerHTML = `<div class="course-badge">${index+1}</div>
-                            <div>
-                                <div class="place-name" style="font-size:15px;">${place.place_name}</div>
-                                <div class="place-addr" style="font-size:12px;">${place.road_address_name}</div>
+            
+            // 뱃지 설정
+            var badgeClass = 'bg-spot'; 
+            var badgeText = '경유';
+            if(place.type === 'start') { badgeClass = 'bg-start'; badgeText = '🚩출발'; }
+            else if(place.type === 'end') { badgeClass = 'bg-end'; badgeText = '🏁도착'; }
+            else if(place.type === 'hotel') { badgeClass = 'bg-hotel'; badgeText = '🏨숙소'; }
+
+            li.innerHTML = `<span class="badge ${badgeClass}">${badgeText}</span>
+                            <div style="flex:1;">
+                                <div style="font-weight:bold; font-size:14px;">${place.place_name}</div>
+                                <div style="font-size:11px; color:#999;">${place.category_group_name || '장소'}</div>
                             </div>
-                            <button class="btn-delete" onclick="deletePlace(${index})">삭제</button>`;
+                            <button class="btn-delete" onclick="deletePlace(${index})">✕</button>`;
             listEl.appendChild(li);
 
+            // 지도 마커 (이미지 다르게 하면 좋지만 일단 색깔 통일)
             var marker = new kakao.maps.Marker({ position: position, map: map, title: place.place_name });
             markers.push(marker);
             linePath.push(position);
@@ -231,68 +250,66 @@
 
         if (linePath.length > 1) {
             polyline = new kakao.maps.Polyline({
-                path: linePath, strokeWeight: 5, strokeColor: '#FF6B6B', strokeOpacity: 0.8, strokeStyle: 'solid'
+                path: linePath, strokeWeight: 6, strokeColor: '#667eea', strokeOpacity: 0.8, strokeStyle: 'solid'
             });
             polyline.setMap(map);
-            document.getElementById('totalInfo').innerText = `총 예상 이동: 약 ${(totalEstDist/1000).toFixed(1)}km`;
-        } else {
-            document.getElementById('totalInfo').innerText = '';
+            document.getElementById('totalInfo').innerText = `총 ${(totalDist/1000).toFixed(1)}km`;
         }
 
         if (myCourse.length > 0) map.setBounds(bounds);
     }
 
-    // 장소 삭제 함수
     function deletePlace(index) {
-        // 확인 창 띄우기 (실수 방지)
-        if(confirm("이 장소를 코스에서 뺄까?")) {
-            myCourse.splice(index, 1);
-            renderCourse();
-        }
+        myCourse.splice(index, 1);
+        renderCourse();
     }
-
     function removeMapElements() {
         markers.forEach(m => m.setMap(null));
         markers = [];
         if (polyline) { polyline.setMap(null); polyline = null; }
     }
 
-    // --- 4. 알고리즘: 최단 거리 정렬 ---
+    // --- [스마트 최적화 알고리즘] ---
     function optimizeCourse() {
-        if(myCourse.length < 3) { alert("최소 3개 장소가 있어야 최적화가 됩니다."); return; }
+        if(myCourse.length < 3) { alert("최적화하려면 3개 이상의 장소가 필요합니다."); return; }
+
+        var startNode = myCourse.find(p => p.type === 'start');
+        var endNode = myCourse.find(p => p.type === 'end');
+        var middleNodes = myCourse.filter(p => p.type !== 'start' && p.type !== 'end');
+
+        // 출발지가 없으면 현재 리스트의 첫번째를 출발지로 가정
+        if(!startNode) { startNode = myCourse[0]; middleNodes = middleNodes.filter(p => p !== startNode); }
         
-        var startNode = myCourse[0]; 
-        var optimized = [startNode];
-        var remaining = myCourse.slice(1);
+        // 정렬 시작
+        var sorted = [startNode];
+        var remaining = middleNodes;
 
         while(remaining.length > 0) {
-            var current = optimized[optimized.length-1];
-            var nearestIdx = 0;
+            var current = sorted[sorted.length-1];
+            var nearestIdx = -1;
             var minDist = Infinity;
 
             for(var i=0; i<remaining.length; i++) {
-                var dist = getDistance(current.y, current.x, remaining[i].y, remaining[i].x);
-                if(dist < minDist) { minDist = dist; nearestIdx = i; }
+                var d = getDistance(current.y, current.x, remaining[i].y, remaining[i].x);
+                if(d < minDist) { minDist = d; nearestIdx = i; }
             }
-            optimized.push(remaining[nearestIdx]);
+            sorted.push(remaining[nearestIdx]);
             remaining.splice(nearestIdx, 1);
         }
-        myCourse = optimized;
+
+        // 도착지가 있으면 마지막에 붙이기
+        if(endNode) sorted.push(endNode);
+
+        myCourse = sorted;
         renderCourse();
-        alert("거리순으로 동선이 깔끔하게 정리되었습니다! 🚗");
+        alert("🚩출발지와 🏁도착지를 기준으로 동선을 최적화했습니다!");
     }
 
     function getDistance(lat1, lon1, lat2, lon2) {
-        var R = 6371; 
-        var dLat = deg2rad(lat2 - lat1); 
-        var dLon = deg2rad(lon2 - lon1); 
-        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        return R * c * 1000;
+        var R = 6371; var dLat = (lat2-lat1)*(Math.PI/180); var dLon = (lon2-lon1)*(Math.PI/180);
+        var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*(Math.PI/180))*Math.cos(lat2*(Math.PI/180))*Math.sin(dLon/2)*Math.sin(dLon/2);
+        var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R*c*1000;
     }
-    function deg2rad(deg) { return deg * (Math.PI/180); }
 </script>
-
 </body>
 </html>
