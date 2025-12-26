@@ -11,6 +11,8 @@
             font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; 
             margin: 0; padding: 0; display: flex; height: 100vh; color: #333; overflow: hidden;
         }
+        a { text-decoration: none; color: inherit; }
+
         #menu_wrap { 
             width: 420px; display: flex; flex-direction: column; background: #fff; 
             box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 20; 
@@ -26,7 +28,7 @@
         /* 검색창 */
         .search-box {
             display: flex; background: #fff; border-radius: 6px; overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 10px;
         }
         .search-box input { 
             flex: 1; border: none; padding: 12px 15px; font-size: 14px; outline: none; 
@@ -35,7 +37,16 @@
             background: #333; color: #fff; border: none; padding: 0 20px; font-size: 14px; font-weight: bold; cursor: pointer;
         }
 
-        /* [기능 1] 날짜 탭 영역 */
+        /* 카테고리 추천 버튼 */
+        .category-btns { display: flex; gap: 5px; justify-content: space-between; }
+        .btn-cat {
+            flex: 1; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); 
+            color: #fff; padding: 8px 0; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-cat:hover { background: #fff; color: #667eea; }
+
+        /* 날짜 탭 영역 */
         .day-tabs-container {
             background: #f0f2f5; padding: 10px 10px 0; border-bottom: 1px solid #ddd; display: flex; align-items: flex-end; gap: 5px; overflow-x: auto;
         }
@@ -48,17 +59,13 @@
             background: #fff; color: #667eea; padding-bottom: 12px; margin-bottom: -1px; 
             border-top: 3px solid #667eea; z-index: 10;
         }
-        
-        /* 탭 컨트롤 버튼 그룹 */
-        .tab-controls {
-            display: flex; gap: 2px; margin-bottom: 5px; margin-left: 5px;
-        }
+        .tab-controls { display: flex; gap: 2px; margin-bottom: 5px; margin-left: 5px; }
         .btn-tab-ctrl {
             width: 32px; height: 32px; border-radius: 6px; border: none;
             font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
         .btn-add-day { background: #333; color: #fff; }
-        .btn-del-day { background: #e74c3c; color: #fff; } /* 삭제 버튼 색상 강조 */
+        .btn-del-day { background: #e74c3c; color: #fff; }
 
         /* 메인 콘텐츠 스크롤 영역 */
         .scroll-area { flex: 1; overflow-y: auto; background: #f8f9fa; }
@@ -74,9 +81,17 @@
         /* 장소 검색 결과 아이템 */
         .place-item { border-bottom: 1px solid #f0f0f0; padding: 10px 0; }
         .place-item:last-child { border-bottom: none; }
-        .place-name { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+        .place-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .place-name { font-weight: bold; font-size: 15px; color: #333; }
+        .place-cat { font-size: 11px; color: #888; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; }
         .place-addr { font-size: 12px; color: #888; margin-bottom: 8px; }
         
+        .btn-review {
+            display: inline-block; font-size: 11px; color: #333; background: #fff; border: 1px solid #ddd;
+            padding: 3px 8px; border-radius: 12px; margin-bottom: 8px; text-decoration: none;
+        }
+        .btn-review:hover { background: #f9f9f9; border-color: #bbb; }
+
         .role-btn-group { display: flex; gap: 5px; }
         .role-btn {
             flex: 1; border: none; padding: 6px 0; border-radius: 4px; font-size: 11px; font-weight: bold; 
@@ -105,7 +120,7 @@
             width: 40px; font-size: 11px; border-radius: 4px; cursor: pointer;
         }
 
-        /* [기능 2] 시나리오 추천 카드 스타일 */
+        /* 시나리오 추천 카드 스타일 */
         .scenario-card {
             background: #f4f6f8; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 10px;
             cursor: pointer; transition: 0.2s; position: relative;
@@ -148,6 +163,11 @@
             <input type="text" id="keyword" placeholder="장소 검색 (예: 수원역, 에버랜드)">
             <button type="submit">검색</button>
         </form>
+        <div class="category-btns">
+            <button class="btn-cat" onclick="searchCategory('FD6')">🍚 맛집 추천</button>
+            <button class="btn-cat" onclick="searchCategory('CE7')">☕ 카페 추천</button>
+            <button class="btn-cat" onclick="searchCategory('AT4')">🎡 활동/관광</button>
+        </div>
     </div>
 
     <div class="day-tabs-container">
@@ -160,7 +180,7 @@
 
     <div class="scroll-area">
         <div id="searchSection" class="section-box" style="display:none;">
-            <span class="section-title">검색 결과</span>
+            <span class="section-title" id="searchResultTitle">검색 결과</span>
             <div id="placesList"></div>
         </div>
 
@@ -173,7 +193,7 @@
             <span class="section-title" id="courseTitle">1일차 상세 일정</span>
             <div id="myCourseList">
                 <div class="status-msg">
-                    아직 일정이 없습니다.<br>위에서 장소를 검색하여 추가해보세요.
+                    아직 일정이 없습니다.<br>위에서 장소를 검색하거나<br>추천 버튼을 눌러보세요.
                 </div>
             </div>
             <div id="totalInfo" style="margin-top:10px; font-size:13px; font-weight:bold; color:#667eea; text-align:right;"></div>
@@ -190,22 +210,18 @@
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4008a66a7ff5dc511df12d63cfeac1f6&libraries=services"></script>
 
 <script>
-    // 1. 지도 생성
     var mapContainer = document.getElementById('map'), 
         mapOption = { center: new kakao.maps.LatLng(37.322157, 127.097858), level: 7 }; 
     var map = new kakao.maps.Map(mapContainer, mapOption); 
-    var ps = new kakao.maps.services.Places(); 
+    var ps = new kakao.maps.services.Places(map); 
     
-    // 2. 데이터 관리
     var allCourses = { 1: [] }; 
     var currentDay = 1; 
     var markers = []; 
     var polyline = null; 
 
-    // 초기화
     renderDayTabs();
 
-    // --- [기능 1] 날짜(탭) 관리 함수 ---
     function renderDayTabs() {
         var wrapper = document.getElementById('dayTabsWrapper');
         wrapper.innerHTML = '';
@@ -224,25 +240,14 @@
         switchDay(newDay); 
     }
 
-    // [신규 기능] 마지막 날짜 삭제 함수
     function removeLastDay() {
         var days = Object.keys(allCourses).map(Number);
-        if (days.length <= 1) {
-            alert("최소 1일차 일정은 유지해야 합니다.");
-            return;
-        }
-
+        if (days.length <= 1) { alert("최소 1일차 일정은 유지해야 합니다."); return; }
         var lastDay = Math.max(...days);
-        
-        if (confirm(lastDay + "일차 일정을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.")) {
+        if (confirm(lastDay + "일차 일정을 삭제하시겠습니까?")) {
             delete allCourses[lastDay];
-            
-            // 만약 현재 보고 있는 날짜가 삭제된 날짜라면, 바로 이전 날짜로 이동
-            if (currentDay === lastDay) {
-                switchDay(lastDay - 1);
-            } else {
-                renderDayTabs(); // 탭만 갱신
-            }
+            if (currentDay === lastDay) switchDay(lastDay - 1);
+            else renderDayTabs();
         }
     }
 
@@ -254,18 +259,27 @@
         renderCourse(); 
     }
 
-    // --- 검색 기능 ---
     function searchPlaces() {
         var keyword = document.getElementById('keyword').value;
         if (!keyword.trim()) { alert('검색어를 입력하세요.'); return; }
-        ps.keywordSearch(keyword, function(data, status) {
-            if (status === kakao.maps.services.Status.OK) {
-                document.getElementById('searchSection').style.display = 'block';
-                displayPlaces(data);
-            } else {
-                alert('검색 결과가 없습니다.');
-            }
-        }); 
+        document.getElementById('searchResultTitle').innerText = '"' + keyword + '" 검색 결과';
+        ps.keywordSearch(keyword, placesSearchCB); 
+    }
+
+    function searchCategory(code) {
+        document.getElementById('searchResultTitle').innerText = '현재 지도 주변 추천 장소';
+        ps.categorySearch(code, placesSearchCB, {useMapCenter: true, sort: kakao.maps.services.SortBy.ACCURACY}); 
+    }
+
+    function placesSearchCB(data, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            document.getElementById('searchSection').style.display = 'block';
+            displayPlaces(data);
+        } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+            alert('검색 결과가 존재하지 않습니다.');
+        } else if (status === kakao.maps.services.Status.ERROR) {
+            alert('검색 중 오류가 발생했습니다.');
+        }
     }
 
     function displayPlaces(places) {
@@ -274,9 +288,14 @@
         places.forEach(function(place) {
             var el = document.createElement('div');
             el.className = 'place-item';
+            var catName = place.category_name.split('>').pop().trim();
             el.innerHTML = `
-                <div class="place-name">${place.place_name}</div>
-                <div class="place-addr">${place.road_address_name}</div>
+                <div class="place-header">
+                    <span class="place-name">${place.place_name}</span>
+                    <span class="place-cat">${catName}</span>
+                </div>
+                <div class="place-addr">${place.road_address_name || place.address_name}</div>
+                <a href="${place.place_url}" target="_blank" class="btn-review">⭐ 리뷰/상세보기</a>
                 <div class="role-btn-group">
                     <button class="role-btn btn-start" onclick='addToCourse(${JSON.stringify(place)}, "start")'>출발</button>
                     <button class="role-btn btn-spot" onclick='addToCourse(${JSON.stringify(place)}, "spot")'>경유</button>
@@ -288,17 +307,14 @@
         });
     }
 
-    // --- 장소 추가 ---
     function addToCourse(place, type) {
         var myCourse = allCourses[currentDay];
-        
         if(myCourse.some(p => p.id === place.id)) { alert("이미 추가된 장소입니다."); return; }
         
         if(type === 'start') myCourse = myCourse.filter(p => p.type !== 'start');
         if(type === 'end') myCourse = myCourse.filter(p => p.type !== 'end');
 
         place.type = type;
-        
         if(type === 'start') myCourse.unshift(place);
         else if(type === 'end') myCourse.push(place);
         else {
@@ -306,7 +322,6 @@
             if(endIdx !== -1) myCourse.splice(endIdx, 0, place);
             else myCourse.push(place);
         }
-        
         allCourses[currentDay] = myCourse;
         renderCourse();
     }
@@ -318,7 +333,7 @@
         removeMapElements(); 
 
         if (courseToRender.length === 0) {
-            listEl.innerHTML = '<div class="status-msg">아직 일정이 없습니다.<br>위에서 장소를 검색하여 추가해보세요.</div>';
+            listEl.innerHTML = '<div class="status-msg">아직 일정이 없습니다.<br>위에서 장소를 검색하거나<br>추천 버튼을 눌러보세요.</div>';
             document.getElementById('totalInfo').innerText = '';
             return;
         }
@@ -329,7 +344,6 @@
 
         courseToRender.forEach(function(place, index) {
             var position = new kakao.maps.LatLng(place.y, place.x);
-            
             if (index > 0) {
                 var prev = courseToRender[index-1];
                 var dist = getDistance(prev.y, prev.x, place.y, place.x) * 1.3; 
@@ -339,8 +353,7 @@
             var li = document.createElement('div');
             li.className = 'course-item';
             
-            var badgeClass = 'bg-spot'; 
-            var badgeText = '경유';
+            var badgeClass = 'bg-spot'; var badgeText = '경유';
             if(place.type === 'start') { badgeClass = 'bg-start'; badgeText = '출발'; }
             else if(place.type === 'end') { badgeClass = 'bg-end'; badgeText = '도착'; }
             else if(place.type === 'hotel') { badgeClass = 'bg-hotel'; badgeText = '숙소'; }
@@ -368,7 +381,6 @@
         } else {
             document.getElementById('totalInfo').innerText = '';
         }
-
         if (courseToRender.length > 0) map.setBounds(bounds);
     }
 
@@ -385,7 +397,6 @@
         if (polyline) { polyline.setMap(null); polyline = null; }
     }
 
-    // --- [기능 2] AI 시나리오 분석 ---
     function analyzeScenarios() {
         var myCourse = allCourses[currentDay];
         if(myCourse.length < 3) { alert("분석을 위해 최소 3개 이상의 장소가 필요합니다."); return; }
@@ -402,27 +413,30 @@
         perms.forEach(function(perm) {
             var tempPath = [startNode].concat(perm);
             if(endNode) tempPath.push(endNode);
-
             var dist = calculateTotalDist(tempPath);
             scenarios.push({ path: tempPath, dist: dist });
         });
 
         scenarios.sort(function(a, b) { return a.dist - b.dist; });
-        var topScenarios = scenarios.slice(0, 3);
-        displayScenarios(topScenarios);
+        displayScenarios(scenarios.slice(0, 3));
     }
 
+    // --- [수정된 부분] ABCD 라벨링 ---
     function displayScenarios(scenarios) {
         var container = document.getElementById('scenarioList');
         container.innerHTML = '';
         document.getElementById('scenarioSection').style.display = 'block';
+        
+        // 알파벳 배열
+        var labels = ['A', 'B', 'C', 'D'];
 
         scenarios.forEach(function(scen, idx) {
             var card = document.createElement('div');
             card.className = 'scenario-card';
             if(idx === 0) card.classList.add('active'); 
             
-            var tagName = idx === 0 ? '추천 1안 (최단 거리)' : '추천 ' + (idx + 1) + '안';
+            // 이름 생성: A안, B안 ... (첫번째는 최단 추천 표시)
+            var tagName = labels[idx] + '안' + (idx === 0 ? ' (최단 추천)' : '');
             var tagClass = idx === 0 ? 'tag-best' : 'tag-alt';
             
             var pathSummary = scen.path.map(p => p.place_name).join(' → ');
@@ -432,18 +446,16 @@
                 <div class="scenario-title">총 거리 ${(scen.dist/1000).toFixed(1)}km</div>
                 <div class="scenario-desc">${pathSummary}</div>
             `;
-            
             card.onclick = function() {
                 document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
                 card.classList.add('active');
                 renderCourse(scen.path); 
             };
-            
             container.appendChild(card);
         });
-
+        
         renderCourse(scenarios[0].path);
-        alert("분석 완료! 가장 효율적인 3가지 경로를 추천해드렸습니다.");
+        alert("분석 완료! A, B, C안으로 최적 경로를 추천해드렸습니다.");
     }
 
     function getPermutations(arr) {
@@ -452,7 +464,6 @@
         var rest = arr.slice(1);
         var permsWithoutFirst = getPermutations(rest);
         var allPermutations = [];
-
         permsWithoutFirst.forEach(function(perm) {
             for (var i = 0; i <= perm.length; i++) {
                 var permWithFirst = perm.slice(0, i).concat([first]).concat(perm.slice(i));
@@ -464,9 +475,7 @@
 
     function calculateTotalDist(path) {
         var total = 0;
-        for(var i=0; i<path.length-1; i++) {
-            total += getDistance(path[i].y, path[i].x, path[i+1].y, path[i+1].x);
-        }
+        for(var i=0; i<path.length-1; i++) total += getDistance(path[i].y, path[i].x, path[i+1].y, path[i+1].x);
         return total;
     }
 
