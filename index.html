@@ -1,252 +1,289 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="utf-8">
-    <title>낭만의 밤: 데이트 코스 메이커</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>낭만의 밤: 리얼 데이트 코스</title>
     <style>
-        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; display: flex; height: 100vh; }
+        /* --- [스타일] 로맨틱하고 깔끔한 UI --- */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; 
+            margin: 0; padding: 0; display: flex; height: 100vh; color: #333; overflow: hidden;
+        }
+        #menu_wrap { 
+            width: 400px; display: flex; flex-direction: column; background: #fff; 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 20; 
+        }
         
-        /* 왼쪽 사이드바 디자인 */
-        #menu_wrap { width: 360px; display: flex; flex-direction: column; background: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.2); z-index: 10; }
-        .search-box { padding: 15px; background: #3396ff; color: #fff; }
-        .search-box h3 { margin: 0 0 10px 0; font-size: 18px; }
-        .search-box input { width: 70%; padding: 8px; border: none; border-radius: 4px; }
-        .search-box button { width: 25%; padding: 8px; border: none; background: #1352a2; color: #fff; border-radius: 4px; cursor: pointer; }
-        
-        /* 검색 결과 리스트 */
-        #placesList { flex: 1; overflow-y: auto; padding: 0; margin: 0; background: #f9f9f9; border-bottom: 1px solid #ddd; }
-        .place-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
-        .place-item:hover { background: #e6f7ff; }
-        .place-name { font-weight: bold; font-size: 16px; color: #333; }
-        .place-addr { font-size: 13px; color: #888; margin-top: 5px; }
+        /* 헤더 & 검색 */
+        .header {
+            padding: 20px;
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+        }
+        .header h1 { margin: 0 0 10px 0; font-size: 20px; color: #fff; font-weight: 800; }
+        .search-box {
+            display: flex; background: #fff; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .search-box input {
+            flex: 1; border: none; padding: 12px; font-size: 15px; outline: none;
+        }
+        .search-box button {
+            background: #FF6B6B; color: #fff; border: none; padding: 0 20px; 
+            font-weight: bold; cursor: pointer;
+        }
 
-        /* 내 코스 리스트 (아래쪽) */
-        .course-box { height: 35%; display: flex; flex-direction: column; border-top: 2px solid #333; background: #fff; }
-        .course-header { padding: 10px; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .course-header h3 { margin: 0; font-size: 16px; }
-        #myCourseList { flex: 1; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
-        .course-item { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; }
-        .course-number { background: #3396ff; color: #fff; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; font-size: 12px; margin-right: 10px; }
-        
-        /* 버튼 */
-        .btn-optimize { width: 100%; padding: 15px; background: #ff5f4a; color: white; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .btn-optimize:hover { background: #e04a36; }
+        /* 리스트 공통 */
+        .list-wrap { flex: 1; overflow-y: auto; background: #f9f9f9; padding: 10px; }
+        .list-wrap::-webkit-scrollbar { width: 6px; }
+        .list-wrap::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
 
-        /* 지도 영역 */
-        #map { flex-grow: 1; }
+        /* 장소 카드 */
+        .place-item {
+            background: #fff; margin-bottom: 10px; padding: 15px; border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
+        }
+        .place-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .place-name { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        .place-addr { font-size: 13px; color: #888; }
+
+        /* 코스 영역 */
+        .course-section {
+            height: 50%; background: #fff; display: flex; flex-direction: column; 
+            border-top: 2px solid #eee;
+        }
+        .course-header {
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #f0f0f0; background: #fff;
+        }
+        .course-item {
+            position: relative; margin-bottom: 0; border-radius: 0; border-bottom: 1px solid #f5f5f5;
+            padding: 15px 20px; display: flex; align-items: center;
+        }
+        .course-badge {
+            width: 24px; height: 24px; background: #333; color: #fff; border-radius: 50%;
+            text-align: center; line-height: 24px; font-size: 12px; margin-right: 15px; font-weight: bold;
+        }
+        
+        /* 이동 정보 (핵심 기능) */
+        .transit-info {
+            background: #f4f6f8; padding: 8px 15px; font-size: 12px; color: #555;
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 3px solid #ccc; margin: 0 20px;
+        }
+        /* 경고 스타일 (오래 걸릴 때) */
+        .transit-warning {
+            background: #FFF0F0; border-left-color: #FF6B6B; color: #D63031; font-weight: bold;
+        }
+        .btn-kakao-nav {
+            background: #FEE500; color: #333; border: none; border-radius: 4px; 
+            padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer; margin-left: 8px;
+        }
+
+        .btn-optimize {
+            width: 90%; margin: 10px auto; padding: 15px; border-radius: 12px; border: none;
+            background: #333; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+
+        #map { flex-grow: 1; height: 100%; }
     </style>
 </head>
 <body>
 
-    <div id="menu_wrap">
-        <div class="search-box">
-            <h3>장소 검색</h3>
-            <form onsubmit="searchPlaces(); return false;">
-                <input type="text" id="keyword" placeholder="예: 강남 맛집, 롯데월드">
-                <button type="submit">검색</button>
-            </form>
-        </div>
+<div id="menu_wrap">
+    <div class="header">
+        <h1>💕 Date Course Maker</h1>
+        <form onsubmit="searchPlaces(); return false;" class="search-box">
+            <input type="text" id="keyword" placeholder="장소 검색 (예: 에버랜드, 강남역)">
+            <button type="submit">검색</button>
+        </form>
+    </div>
 
-        <div id="placesList">
-            <div style="padding:20px; text-align:center; color:#999;">키워드를 검색하고<br>장소를 클릭해서 추가하세요.</div>
-        </div>
-        
-        <div class="course-box">
-            <div class="course-header">
-                <h3>내 여행 코스</h3>
-                <span id="totalDist" style="font-size:12px; color:#ddd;">0km</span>
-            </div>
-            <ul id="myCourseList"></ul>
-            <button class="btn-optimize" onclick="optimizeCourse()">🔄 동선 최적화 (거리순 정렬)</button>
+    <div id="placesList" class="list-wrap">
+        <div style="text-align:center; padding:50px 0; color:#aaa;">
+            장소를 검색하고 클릭해서<br>코스에 추가하세요.
         </div>
     </div>
 
-    <div id="map"></div>
+    <div class="course-section">
+        <div class="course-header">
+            <span style="font-weight:bold; font-size:16px;">내 여행 코스</span>
+            <span id="totalInfo" style="font-size:13px; color:#FF6B6B; font-weight:bold;"></span>
+        </div>
+        <div id="myCourseList" class="list-wrap" style="background:#fff;"></div>
+        <button class="btn-optimize" onclick="optimizeCourse()">✨ 동선 최적화 (거리순 정렬)</button>
+    </div>
+</div>
 
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4008a66a7ff5dc511df12d63cfeac1f6&libraries=services"></script>
+<div id="map"></div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4008a66a7ff5dc511df12d63cfeac1f6&libraries=services"></script>
+
+<script>
+    // --- 1. 지도 초기화 ---
+    var mapContainer = document.getElementById('map'), 
+        mapOption = { center: new kakao.maps.LatLng(37.322157, 127.097858), level: 7 }; 
+    var map = new kakao.maps.Map(mapContainer, mapOption); 
+    var ps = new kakao.maps.services.Places(); 
     
-    <script>
-        // 1. 지도 생성
-        var mapContainer = document.getElementById('map'), 
-            mapOption = {
-                center: new kakao.maps.LatLng(37.566826, 126.9786567), 
-                level: 3 
-            };  
-        var map = new kakao.maps.Map(mapContainer, mapOption); 
-        
-        // 2. 주요 변수
-        var ps = new kakao.maps.services.Places(); // 장소 검색 객체
-        var myCourse = []; // 선택한 장소 데이터 저장
-        var markers = [];  // 지도에 표시된 마커들
-        var polyline = null; // 경로 선
+    var myCourse = []; 
+    var markers = []; 
+    var polyline = null; 
 
-        // 3. 키워드 검색 함수
-        function searchPlaces() {
-            var keyword = document.getElementById('keyword').value;
-            if (!keyword.trim()) {
-                alert('키워드를 입력해주세요!');
-                return;
-            }
-            ps.keywordSearch(keyword, placesSearchCB); 
-        }
+    // --- 2. 검색 관련 함수 ---
+    function searchPlaces() {
+        var keyword = document.getElementById('keyword').value;
+        if (!keyword.trim()) { alert('장소를 입력해주세요!'); return; }
+        ps.keywordSearch(keyword, function(data, status) {
+            if (status === kakao.maps.services.Status.OK) displayPlaces(data);
+            else if (status === kakao.maps.services.Status.ZERO_RESULT) alert('검색 결과가 없습니다.');
+            else alert('오류가 발생했습니다.');
+        }); 
+    }
 
-        // 4. 검색 결과 콜백
-        function placesSearchCB(data, status, pagination) {
-            if (status === kakao.maps.services.Status.OK) {
-                displayPlaces(data);
-            } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-                alert('검색 결과가 없습니다.');
-            } else if (status === kakao.maps.services.Status.ERROR) {
-                alert('검색 중 오류가 발생했습니다.');
-            }
-        }
+    function displayPlaces(places) {
+        var listEl = document.getElementById('placesList');
+        listEl.innerHTML = '';
+        places.forEach(function(place) {
+            var el = document.createElement('div');
+            el.className = 'place-item';
+            el.innerHTML = '<div class="place-name">' + place.place_name + '</div>' +
+                           '<div class="place-addr">' + place.road_address_name + '</div>';
+            el.onclick = function() { addToCourse(place); };
+            listEl.appendChild(el);
+        });
+    }
 
-        // 5. 검색 결과 리스트 표시
-        function displayPlaces(places) {
-            var listEl = document.getElementById('placesList');
-            listEl.innerHTML = ''; 
+    function addToCourse(place) {
+        // 중복 방지
+        if(myCourse.some(p => p.id === place.id)) { alert("이미 추가된 장소입니다."); return; }
+        myCourse.push(place);
+        renderCourse();
+    }
 
-            for (var i=0; i<places.length; i++) {
-                var itemEl = document.createElement('div');
-                itemEl.className = 'place-item';
-                itemEl.innerHTML = '<div class="place-name">' + places[i].place_name + '</div>' +
-                                   '<div class="place-addr">' + places[i].road_address_name + '</div>';
-                
-                // 클릭 이벤트 (클로저)
-                (function(place) {
-                    itemEl.onclick = function() {
-                        addToCourse(place);
-                    };
-                })(places[i]);
+    // --- 3. 핵심 로직: 코스 그리기 및 "보정 거리" 계산 ---
+    function renderCourse() {
+        var listEl = document.getElementById('myCourseList');
+        listEl.innerHTML = '';
+        removeMapElements(); // 기존 마커/선 제거
 
-                listEl.appendChild(itemEl);
-            }
-        }
+        var linePath = [];
+        var bounds = new kakao.maps.LatLngBounds();
+        var totalEstDist = 0; // 총 예상 거리
 
-        // 6. 코스 추가 및 지도 그리기
-        function addToCourse(place) {
-            // 중복 체크
-            for(var i=0; i<myCourse.length; i++) {
-                if(myCourse[i].id === place.id) {
-                    alert("이미 코스에 있는 장소입니다.");
-                    return;
-                }
-            }
-
-            // 데이터 추가
-            myCourse.push(place);
-            renderCourse(); // 화면 갱신
-        }
-
-        // 7. 화면 및 지도 갱신 (핵심 로직)
-        function renderCourse() {
-            var listEl = document.getElementById('myCourseList');
-            listEl.innerHTML = '';
+        myCourse.forEach(function(place, index) {
+            var position = new kakao.maps.LatLng(place.y, place.x);
             
-            // 기존 마커 및 선 제거
-            removeMapElements();
-
-            var linePath = [];
-            var bounds = new kakao.maps.LatLngBounds(); // 지도 범위 재설정용
-
-            for(var i=0; i<myCourse.length; i++) {
-                var place = myCourse[i];
-                var position = new kakao.maps.LatLng(place.y, place.x);
+            // 1) 이동 정보 표시 (첫 장소 제외)
+            if (index > 0) {
+                var prev = myCourse[index-1];
                 
-                // 1) 리스트에 추가
-                var li = document.createElement('li');
-                li.className = 'course-item';
-                li.innerHTML = '<span class="course-number">' + (i+1) + '</span>' + 
-                               '<span>' + place.place_name + '</span>';
-                listEl.appendChild(li);
-
-                // 2) 지도에 마커 추가
-                var marker = new kakao.maps.Marker({
-                    position: position,
-                    map: map,
-                    title: place.place_name
-                });
-                markers.push(marker);
-
-                // 3) 선 그리기용 경로 저장
-                linePath.push(position);
-                bounds.extend(position);
-            }
-
-            // 4) 경로 선 그리기
-            if(linePath.length > 1) {
-                polyline = new kakao.maps.Polyline({
-                    path: linePath, 
-                    strokeWeight: 5, 
-                    strokeColor: '#ff5f4a', 
-                    strokeOpacity: 0.8, 
-                    strokeStyle: 'solid' 
-                });
-                polyline.setMap(map);
+                // ★ 거리 보정 알고리즘 (직선거리 x 1.4배 = 실제 도로 추정치)
+                var straightDist = getDistance(prev.y, prev.x, place.y, place.x);
+                var estRealDist = Math.round(straightDist * 1.4); 
+                var walkMin = Math.round(estRealDist / 67); // 성인 평균 분속 67m
                 
-                // 거리 계산해서 표시
-                var distance = Math.round(polyline.getLength());
-                document.getElementById('totalDist').innerText = "총 거리: " + (distance/1000).toFixed(1) + "km";
+                totalEstDist += estRealDist;
+
+                var transitDiv = document.createElement('div');
+                var isLong = walkMin > 20; // 20분 넘으면 경고
+
+                transitDiv.className = isLong ? 'transit-info transit-warning' : 'transit-info';
+                
+                var msg = isLong ? `🚶 도보 약 ${walkMin}분 (힘들어요! 택시/버스 추천)` : `🚶 도보 약 ${walkMin}분 (${estRealDist}m)`;
+                
+                // 카카오맵 길찾기 링크 생성
+                var naviLink = `https://map.kakao.com/link/to/${place.place_name},${place.y},${place.x}/from/${prev.place_name},${prev.y},${prev.x}`;
+                
+                transitDiv.innerHTML = `<span>${msg}</span> 
+                                        <button class="btn-kakao-nav" onclick="window.open('${naviLink}')">길찾기 ▶</button>`;
+                listEl.appendChild(transitDiv);
             }
 
-            // 5) 지도 범위 자동 조정
-            if(myCourse.length > 0) {
-                map.setBounds(bounds);
-            }
+            // 2) 장소 카드 표시
+            var li = document.createElement('div');
+            li.className = 'course-item';
+            li.innerHTML = `<div class="course-badge">${index+1}</div>
+                            <div>
+                                <div class="place-name" style="font-size:15px;">${place.place_name}</div>
+                                <div class="place-addr" style="font-size:12px;">${place.road_address_name}</div>
+                            </div>
+                            <button onclick="deletePlace(${index})" style="margin-left:auto; border:none; background:none; color:#ccc; cursor:pointer;">✖</button>`;
+            listEl.appendChild(li);
+
+            // 3) 지도 마커 추가
+            var marker = new kakao.maps.Marker({ position: position, map: map, title: place.place_name });
+            markers.push(marker);
+            linePath.push(position);
+            bounds.extend(position);
+        });
+
+        // 4) 지도에 선 그리기
+        if (linePath.length > 1) {
+            polyline = new kakao.maps.Polyline({
+                path: linePath, strokeWeight: 5, strokeColor: '#FF6B6B', strokeOpacity: 0.8, strokeStyle: 'solid'
+            });
+            polyline.setMap(map);
+            document.getElementById('totalInfo').innerText = `총 예상 이동: 약 ${(totalEstDist/1000).toFixed(1)}km`;
+        } else {
+            document.getElementById('totalInfo').innerText = '';
         }
 
-        // 지도 위 요소들 지우기
-        function removeMapElements() {
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].setMap(null);
+        if (myCourse.length > 0) map.setBounds(bounds);
+    }
+
+    // 장소 삭제
+    function deletePlace(index) {
+        myCourse.splice(index, 1); // 배열에서 삭제
+        renderCourse(); // 다시 그리기
+    }
+
+    function removeMapElements() {
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+        if (polyline) { polyline.setMap(null); polyline = null; }
+    }
+
+    // --- 4. 알고리즘: 최단 거리 정렬 (TSP 근사) ---
+    function optimizeCourse() {
+        if(myCourse.length < 3) { alert("최소 3개 장소가 있어야 최적화가 됩니다."); return; }
+        
+        var startNode = myCourse[0]; // 첫 장소는 고정
+        var optimized = [startNode];
+        var remaining = myCourse.slice(1);
+
+        while(remaining.length > 0) {
+            var current = optimized[optimized.length-1];
+            var nearestIdx = 0;
+            var minDist = Infinity;
+
+            for(var i=0; i<remaining.length; i++) {
+                var dist = getDistance(current.y, current.x, remaining[i].y, remaining[i].x);
+                if(dist < minDist) { minDist = dist; nearestIdx = i; }
             }
-            markers = [];
-            if (polyline) {
-                polyline.setMap(null);
-                polyline = null;
-            }
+            optimized.push(remaining[nearestIdx]);
+            remaining.splice(nearestIdx, 1);
         }
+        myCourse = optimized;
+        renderCourse();
+        alert("거리순으로 동선이 깔끔하게 정리되었습니다! 🚗");
+    }
 
-        // 8. [알고리즘] 동선 최적화 (탐욕 알고리즘: 가까운 곳부터 가기)
-        function optimizeCourse() {
-            if(myCourse.length < 3) {
-                alert("최소 3개 이상의 장소가 있어야 최적화가 가능합니다.");
-                return;
-            }
+    // Haversine 공식을 이용한 정확한 직선 거리 계산 (단위: m)
+    function getDistance(lat1, lon1, lat2, lon2) {
+        var R = 6371; // 지구 반지름 (km)
+        var dLat = deg2rad(lat2 - lat1); 
+        var dLon = deg2rad(lon2 - lon1); 
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        var d = R * c; // km Distance
+        return d * 1000; // m로 변환
+    }
 
-            var startNode = myCourse[0]; // 첫 번째 장소는 '숙소'나 '출발지'로 고정
-            var optimized = [startNode];
-            var remaining = myCourse.slice(1); // 나머지만 정렬 대상
+    function deg2rad(deg) { return deg * (Math.PI/180); }
+</script>
 
-            while(remaining.length > 0) {
-                var current = optimized[optimized.length - 1];
-                var nearestIdx = -1;
-                var minDist = Infinity;
-
-                // 가장 가까운 다음 장소 찾기
-                for(var i=0; i<remaining.length; i++) {
-                    var dist = getDistance(current.y, current.x, remaining[i].y, remaining[i].x);
-                    if(dist < minDist) {
-                        minDist = dist;
-                        nearestIdx = i;
-                    }
-                }
-
-                // 찾은 장소를 확정 목록으로 이동
-                optimized.push(remaining[nearestIdx]);
-                remaining.splice(nearestIdx, 1);
-            }
-
-            myCourse = optimized; // 순서 덮어쓰기
-            renderCourse(); // 다시 그리기
-            alert("동선이 거리순으로 재정렬되었습니다!");
-        }
-
-        // 직선 거리 계산 함수 (피타고라스 근사치, 실제 도로 아님)
-        function getDistance(lat1, lon1, lat2, lon2) {
-            return Math.sqrt(Math.pow(lat1 - lat2, 2) + Math.pow(lon1 - lon2, 2));
-        }
-
-    </script>
 </body>
 </html>
