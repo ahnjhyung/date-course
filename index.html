@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>낭만의 밤: AI 트래블 마스터</title>
+    <title>낭만의 밤: AI 트래블 플래너</title>
     <style>
-        /* --- 기본 스타일 --- */
+        /* --- [기본 스타일: 이모지 없는 깔끔한 텍스트 중심] --- */
         * { box-sizing: border-box; }
         body { 
             font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif; 
@@ -16,12 +16,14 @@
             box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 20; 
         }
         
+        /* 헤더 디자인 */
         .header {
             padding: 25px 20px 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
         }
         .header h1 { margin: 0 0 15px 0; font-size: 20px; color: #fff; font-weight: 700; letter-spacing: -0.5px; }
         
+        /* 검색창 */
         .search-box {
             display: flex; background: #fff; border-radius: 6px; overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -33,19 +35,7 @@
             background: #333; color: #fff; border: none; padding: 0 20px; font-size: 14px; font-weight: bold; cursor: pointer;
         }
 
-        /* [NEW] 이동 수단 토글 스위치 */
-        .mode-switch-wrap {
-            display: flex; background: #fff; margin: 10px 10px 0; border: 1px solid #ddd;
-            border-radius: 6px; overflow: hidden;
-        }
-        .mode-btn {
-            flex: 1; padding: 10px; border: none; background: #f5f5f5; cursor: pointer;
-            font-size: 13px; font-weight: bold; color: #888; transition: 0.2s;
-        }
-        .mode-btn.active {
-            background: #667eea; color: #fff;
-        }
-
+        /* [기능 1] 날짜 탭 영역 */
         .day-tabs-container {
             background: #f0f2f5; padding: 10px 10px 0; border-bottom: 1px solid #ddd; display: flex; align-items: flex-end; gap: 5px; overflow-x: auto;
         }
@@ -63,6 +53,7 @@
             font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 5px; margin-left: 5px;
         }
 
+        /* 메인 콘텐츠 스크롤 영역 */
         .scroll-area { flex: 1; overflow-y: auto; background: #f8f9fa; }
 
         .section-box {
@@ -73,6 +64,7 @@
             font-size: 14px; font-weight: bold; color: #667eea; margin-bottom: 10px; display: block; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px;
         }
 
+        /* 장소 검색 결과 아이템 */
         .place-item { border-bottom: 1px solid #f0f0f0; padding: 10px 0; }
         .place-item:last-child { border-bottom: none; }
         .place-name { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
@@ -88,6 +80,7 @@
         .btn-hotel { background: #9b59b6; } 
         .btn-spot { background: #3498db; }  
 
+        /* 내 코스 아이템 */
         .course-item {
             display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f5;
         }
@@ -105,6 +98,7 @@
             width: 40px; font-size: 11px; border-radius: 4px; cursor: pointer;
         }
 
+        /* [기능 2] 시나리오 추천 카드 스타일 */
         .scenario-card {
             background: #f4f6f8; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 10px;
             cursor: pointer; transition: 0.2s; position: relative;
@@ -122,6 +116,7 @@
         .scenario-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; color: #333; }
         .scenario-desc { font-size: 13px; color: #666; line-height: 1.4; }
 
+        /* 하단 고정 버튼 */
         .bottom-area {
             padding: 15px; background: #fff; border-top: 1px solid #ddd;
         }
@@ -143,14 +138,9 @@
     <div class="header">
         <h1>Date Course Master</h1>
         <form onsubmit="searchPlaces(); return false;" class="search-box">
-            <input type="text" id="keyword" placeholder="장소 검색 (예: 강남역, 에버랜드)">
+            <input type="text" id="keyword" placeholder="장소 검색 (예: 수원역, 에버랜드)">
             <button type="submit">검색</button>
         </form>
-    </div>
-
-    <div class="mode-switch-wrap">
-        <button class="mode-btn active" id="modeWalk" onclick="setMode('walk')">도보 여행 (꼼꼼하게)</button>
-        <button class="mode-btn" id="modeCar" onclick="setMode('car')">차량 이동 (빠르게)</button>
     </div>
 
     <div class="day-tabs-container">
@@ -165,21 +155,23 @@
         </div>
 
         <div id="scenarioSection" class="section-box" style="display:none;">
-            <span class="section-title">AI 시나리오 분석 결과</span>
+            <span class="section-title">AI 추천 경로 (Top 3)</span>
             <div id="scenarioList"></div>
         </div>
 
         <div class="section-box">
             <span class="section-title" id="courseTitle">1일차 상세 일정</span>
             <div id="myCourseList">
-                <div class="status-msg">아직 일정이 없습니다.<br>위에서 장소를 검색하여 추가해보세요.</div>
+                <div class="status-msg">
+                    아직 일정이 없습니다.<br>위에서 장소를 검색하여 추가해보세요.
+                </div>
             </div>
             <div id="totalInfo" style="margin-top:10px; font-size:13px; font-weight:bold; color:#667eea; text-align:right;"></div>
         </div>
     </div>
 
     <div class="bottom-area">
-        <button class="btn-analyze" onclick="analyzeScenarios()">최적 경로 분석 실행</button>
+        <button class="btn-analyze" onclick="analyzeScenarios()">현재 일정 최적 경로 분석</button>
     </div>
 </div>
 
@@ -188,43 +180,23 @@
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4008a66a7ff5dc511df12d63cfeac1f6&libraries=services"></script>
 
 <script>
+    // 1. 지도 생성
     var mapContainer = document.getElementById('map'), 
         mapOption = { center: new kakao.maps.LatLng(37.322157, 127.097858), level: 7 }; 
     var map = new kakao.maps.Map(mapContainer, mapOption); 
     var ps = new kakao.maps.services.Places(); 
     
+    // 2. 데이터 관리 (날짜별 코스 저장)
+    // 예: { 1: [장소A, 장소B], 2: [장소C] }
     var allCourses = { 1: [] }; 
     var currentDay = 1; 
     var markers = []; 
     var polyline = null; 
-    
-    // [NEW] 이동 모드 변수 (기본: 도보)
-    var travelMode = 'walk'; 
-    // 모드별 설정 (보정계수, 분당 이동거리 m)
-    // 도보: 굴곡 많음(1.5배), 분속 67m (시속 4km)
-    // 차량: 굴곡 적음(1.2배), 분속 500m (시속 30km - 시내주행)
-    var modeSettings = {
-        'walk': { factor: 1.5, speedMpM: 67 },
-        'car': { factor: 1.2, speedMpM: 500 }
-    };
 
+    // 초기화
     renderDayTabs();
 
-    // --- 이동 모드 변경 함수 ---
-    function setMode(mode) {
-        travelMode = mode;
-        // 버튼 스타일 변경
-        document.getElementById('modeWalk').className = mode === 'walk' ? 'mode-btn active' : 'mode-btn';
-        document.getElementById('modeCar').className = mode === 'car' ? 'mode-btn active' : 'mode-btn';
-        
-        // 데이터가 있다면 다시 계산해서 렌더링
-        if(allCourses[currentDay].length > 1) {
-            renderCourse();
-            // 시나리오가 열려있다면 닫기 (조건이 바뀌었으므로)
-            document.getElementById('scenarioSection').style.display = 'none';
-        }
-    }
-
+    // --- [기능 1] 날짜(탭) 관리 함수 ---
     function renderDayTabs() {
         var wrapper = document.getElementById('dayTabsWrapper');
         wrapper.innerHTML = '';
@@ -239,18 +211,19 @@
 
     function addNewDay() {
         var newDay = Object.keys(allCourses).length + 1;
-        allCourses[newDay] = []; 
+        allCourses[newDay] = []; // 새 공간 생성
         switchDay(newDay); 
     }
 
     function switchDay(day) {
         currentDay = day;
         document.getElementById('courseTitle').innerText = day + '일차 상세 일정';
-        document.getElementById('scenarioSection').style.display = 'none'; 
+        document.getElementById('scenarioSection').style.display = 'none'; // 날짜 바뀌면 추천 결과 초기화
         renderDayTabs(); 
-        renderCourse();  
+        renderCourse();  // 해당 날짜의 데이터로 다시 그리기
     }
 
+    // --- 검색 기능 ---
     function searchPlaces() {
         var keyword = document.getElementById('keyword').value;
         if (!keyword.trim()) { alert('검색어를 입력하세요.'); return; }
@@ -284,15 +257,19 @@
         });
     }
 
+    // --- 장소 추가 (현재 날짜에) ---
     function addToCourse(place, type) {
         var myCourse = allCourses[currentDay];
+        
         if(myCourse.some(p => p.id === place.id)) { alert("이미 추가된 장소입니다."); return; }
         
+        // 출발/도착 유일성 보장
         if(type === 'start') myCourse = myCourse.filter(p => p.type !== 'start');
         if(type === 'end') myCourse = myCourse.filter(p => p.type !== 'end');
 
         place.type = type;
         
+        // 기본 정렬: 출발은 맨 앞, 도착은 맨 뒤
         if(type === 'start') myCourse.unshift(place);
         else if(type === 'end') myCourse.push(place);
         else {
@@ -301,11 +278,13 @@
             else myCourse.push(place);
         }
         
+        // 데이터 저장 및 화면 갱신
         allCourses[currentDay] = myCourse;
         renderCourse();
     }
 
     function renderCourse(tempCourse) {
+        // 임시 코스(시나리오 클릭 시)가 없으면 현재 저장된 코스 사용
         var courseToRender = tempCourse || allCourses[currentDay];
         var listEl = document.getElementById('myCourseList');
         listEl.innerHTML = '';
@@ -320,23 +299,15 @@
         var linePath = [];
         var bounds = new kakao.maps.LatLngBounds();
         var totalDist = 0;
-        var totalMin = 0;
-        
-        // 현재 모드 설정 가져오기
-        var settings = modeSettings[travelMode];
 
         courseToRender.forEach(function(place, index) {
             var position = new kakao.maps.LatLng(place.y, place.x);
             
+            // 거리 계산 (이전 장소와)
             if (index > 0) {
                 var prev = courseToRender[index-1];
-                // 거리 및 시간 계산 (보정계수 적용)
-                var rawDist = getDistance(prev.y, prev.x, place.y, place.x);
-                var estDist = rawDist * settings.factor; // 보정된 거리
-                var estMin = Math.round(estDist / settings.speedMpM); // 예상 소요 시간
-                
-                totalDist += estDist;
-                totalMin += estMin;
+                var dist = getDistance(prev.y, prev.x, place.y, place.x) * 1.3; 
+                totalDist += dist;
             }
 
             var li = document.createElement('div');
@@ -367,10 +338,7 @@
                 path: linePath, strokeWeight: 5, strokeColor: '#667eea', strokeOpacity: 0.8, strokeStyle: 'solid'
             });
             polyline.setMap(map);
-            
-            // 모드에 따라 텍스트 다르게 표시
-            var modeText = travelMode === 'walk' ? '도보' : '차량';
-            document.getElementById('totalInfo').innerText = `[${modeText}] 약 ${(totalDist/1000).toFixed(1)}km / ${Math.floor(totalMin/60)}시간 ${totalMin%60}분 소요`;
+            document.getElementById('totalInfo').innerText = `총 예상 이동 ${ (totalDist/1000).toFixed(1) }km`;
         } else {
             document.getElementById('totalInfo').innerText = '';
         }
@@ -391,19 +359,23 @@
         if (polyline) { polyline.setMap(null); polyline = null; }
     }
 
+    // --- [기능 2] AI 시나리오 분석 (완전 탐색) ---
     function analyzeScenarios() {
         var myCourse = allCourses[currentDay];
         if(myCourse.length < 3) { alert("분석을 위해 최소 3개 이상의 장소가 필요합니다."); return; }
 
+        // 1. 고정점 분리
         var startNode = myCourse.find(p => p.type === 'start');
         var endNode = myCourse.find(p => p.type === 'end');
         var middleNodes = myCourse.filter(p => p.type !== 'start' && p.type !== 'end');
 
         if(!startNode) { startNode = myCourse[0]; middleNodes = middleNodes.filter(p => p !== startNode); }
 
+        // 2. 모든 순열 생성 (경우의 수)
         var perms = getPermutations(middleNodes);
         var scenarios = [];
 
+        // 3. 거리 계산
         perms.forEach(function(perm) {
             var tempPath = [startNode].concat(perm);
             if(endNode) tempPath.push(endNode);
@@ -412,7 +384,10 @@
             scenarios.push({ path: tempPath, dist: dist });
         });
 
+        // 4. 거리순 정렬 (짧은 순)
         scenarios.sort(function(a, b) { return a.dist - b.dist; });
+
+        // 5. 상위 3개 표시
         var topScenarios = scenarios.slice(0, 3);
         displayScenarios(topScenarios);
     }
@@ -421,47 +396,49 @@
         var container = document.getElementById('scenarioList');
         container.innerHTML = '';
         document.getElementById('scenarioSection').style.display = 'block';
-        
-        var settings = modeSettings[travelMode]; // 현재 모드 설정 적용
 
         scenarios.forEach(function(scen, idx) {
             var card = document.createElement('div');
             card.className = 'scenario-card';
-            if(idx === 0) card.classList.add('active'); 
+            if(idx === 0) card.classList.add('active'); // 첫 번째 추천 자동 활성화
             
-            var tagName = idx === 0 ? '추천 1안 (최단)' : '추천 ' + (idx + 1) + '안';
+            var tagName = idx === 0 ? '추천 1안 (최단 거리)' : '추천 ' + (idx + 1) + '안';
             var tagClass = idx === 0 ? 'tag-best' : 'tag-alt';
             
+            // 경로 요약 텍스트
             var pathSummary = scen.path.map(p => p.place_name).join(' → ');
-            
-            // 시나리오 결과도 현재 모드에 맞춰 계산
-            var estDist = scen.dist * settings.factor;
-            var estMin = Math.round(estDist / settings.speedMpM);
 
             card.innerHTML = `
                 <span class="scenario-tag ${tagClass}">${tagName}</span>
-                <div class="scenario-title">${(estDist/1000).toFixed(1)}km / ${Math.floor(estMin/60)}시간 ${estMin%60}분</div>
+                <div class="scenario-title">총 거리 ${(scen.dist/1000).toFixed(1)}km</div>
                 <div class="scenario-desc">${pathSummary}</div>
             `;
             
             card.onclick = function() {
+                // UI 활성화 효과
                 document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
                 card.classList.add('active');
+                
+                // 지도에 미리보기 반영 (저장은 안 함)
                 renderCourse(scen.path); 
             };
+            
             container.appendChild(card);
         });
 
+        // 가장 좋은 경로로 지도 자동 업데이트
         renderCourse(scenarios[0].path);
-        alert(`[${travelMode === 'walk' ? '도보' : '차량'}] 모드로 최적 경로를 분석했습니다.`);
+        alert("분석 완료! 가장 효율적인 3가지 경로를 추천해드렸습니다.");
     }
 
+    // 순열 알고리즘 (재귀)
     function getPermutations(arr) {
         if (arr.length === 0) return [[]];
         var first = arr[0];
         var rest = arr.slice(1);
         var permsWithoutFirst = getPermutations(rest);
         var allPermutations = [];
+
         permsWithoutFirst.forEach(function(perm) {
             for (var i = 0; i <= perm.length; i++) {
                 var permWithFirst = perm.slice(0, i).concat([first]).concat(perm.slice(i));
